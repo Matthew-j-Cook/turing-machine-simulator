@@ -32,8 +32,7 @@ struct state
 
 struct machine
 {
-    struct state *initial_state; // Pointer to the initial state of the machine
-    struct state **states;       // Pointer to an array of all states in the machine
+    struct state *current_state; // Pointer to the current state, starts at initial state.
     int num_states;              // The number of states in the machine
     int head_position;           // The current position of the tape head
     char *tape;                  // Pointer to the tape (array of symbols)
@@ -43,10 +42,15 @@ struct machine
 struct state *create_state(int id, char is_accepting);
 void delete_state(struct state *state);
 
-int add_edge_to_state(struct state *state, struct edge *edge);
-
 struct edge *create_edge(struct state *to_state, char required_symbol,
                          enum action_type action, char write_symbol);
-struct machine *create_machine(struct state *initial_state, struct state **states, int num_states,
-                               int head_position, int *tape, int tape_length);
+int add_edge_to_state(struct state *state, struct edge *edge);
+
+struct machine *create_machine(struct state *initial_state, int head_position,
+                               char *tape, int tape_length);
+
+int is_computation_complete(struct machine *machine);
+int step_machine(struct machine *machine);
+struct edge *find_next_edge_from_symbol(int symbol, struct state *state);
+
 #endif // MACHINE_H

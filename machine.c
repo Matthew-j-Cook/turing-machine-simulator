@@ -1,5 +1,10 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "machine.h"
+
+// Conventions:
+// Let X be the input alphabet
+// Let Y be the tape alphabet
 
 struct state *create_state(int id, char is_accepting)
 {
@@ -15,10 +20,11 @@ int add_edge_to_state(struct state *state, struct edge *edge)
     if (state->num_edges > MAX_EDGES_PER_STATE)
     {
         printf("WARNING: Too many edges for state of id: %d", state->id);
-        return;
+        return 1;
     }
     state->edges[state->num_edges] = edge;
     state->num_edges++;
+    return 0;
 }
 void delete_state(struct state *state)
 {
@@ -42,16 +48,86 @@ struct edge *create_edge(struct state *to_state, char required_symbol,
     edge->required_symbol = required_symbol;
     edge->action = action;
     edge->write_symbol = write_symbol;
+    return edge;
 }
-struct machine *create_machine(struct state *initial_state, struct state **states, int num_states,
-                               int head_position, int *tape, int tape_length)
+struct machine *create_machine(struct state *initial_state, int head_position,
+                               char *tape, int tape_length)
 {
     struct machine *newMachine = (struct machine *)malloc(sizeof(struct machine));
-    newMachine->initial_state = initial_state;
-    newMachine->states = states;
-    newMachine->num_states = num_states;
+    newMachine->current_state = initial_state;
     newMachine->head_position = head_position;
     newMachine->tape = tape;
     newMachine->tape_length = tape_length;
     return newMachine;
+}
+
+/**
+ * @brief
+ *
+ * @param machine
+ * @return int 1 if complete, 0 if not
+ */
+int is_computation_complete(struct machine *machine)
+{
+    // Head not parked
+    if (!(machine->head_position == 0))
+    {
+        return 0;
+    }
+    // Not in an accepting state
+    if (machine->current_state->is_accepting != 1)
+    {
+        return 0;
+    }
+    // Check Y ⊂ X
+    return 1;
+}
+
+int step_machine(struct machine *machine)
+{
+    struct edge *next_edge = find_next_edge_from_symbol((machine->tape)[machine->head_position],
+                                                        machine->current_state);
+    if (next_edge == NULL)
+    {
+        printf("FATAL ERROR\n");
+        return -1;
+    }
+    // printf("NEXT EDGE IS: %c\n", next_edge->required_symbol);
+
+    if (next_edge->action == WRITE)
+    {
+        (machine->tape)[machine->head_position] = next_edge->write_symbol;
+    }
+    if (next_edge->action == MOVE_LEFT)
+    {
+        machine->head_position--;
+    }
+    if (next_edge->action == MOVE_RIGHT)
+    {
+        machine->head_position++;
+    }
+    machine->current_state = next_edge->to_state;
+
+    return 0;
+}
+
+/**
+ * @brief Given a symbol and a state, find which edge should be traversed next
+ *
+ * @param symbol
+ * @param state
+ * @return struct edge*
+ */
+struct edge *find_next_edge_from_symbol(int symbol, struct state *state)
+{
+    for (int i = 0; i < state->num_edges; i++)
+    {
+        struct edge *current_edge = (struct edge *)state->edges[i];
+        if (current_edge->required_symbol == symbol)
+        {
+            return current_edge;
+        }
+    }
+    printf("STATE %d is pointing at %d EDGES", state->id, state->num_edges);
+    return NULL;
 }
