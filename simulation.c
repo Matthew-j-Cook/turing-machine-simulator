@@ -64,6 +64,7 @@ int main()
         int result = step_machine(machine);
         if (result == -1)
         {
+            printf("Computation aborted.\n");
             break;
         }
     }

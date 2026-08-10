@@ -111,9 +111,10 @@ int step_machine(struct machine *machine)
 {
     struct edge *next_edge = find_matching_edge((machine->tape)[machine->head_position],
                                                 machine->current_state);
+
+    // If no matching edge is found, the computation is aborted.
     if (next_edge == NULL)
     {
-        printf("FATAL ERROR\n");
         return -1;
     }
     // Perform the action associated with the edge
