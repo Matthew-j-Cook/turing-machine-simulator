@@ -51,6 +51,6 @@ struct machine *create_machine(struct state *initial_state, int head_position,
 
 int is_computation_complete(struct machine *machine);
 int step_machine(struct machine *machine);
-struct edge *find_next_edge_from_symbol(int symbol, struct state *state);
+struct edge *find_matching_edge(int symbol, struct state *state);
 
 #endif // MACHINE_H

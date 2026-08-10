@@ -23,45 +23,43 @@ void print_tape(struct machine *machine)
 
 int main()
 {
-    char tape[1024] = "10101010101____";
+    // This simple turing machine will add one to a unary number. Note 0 = 1, 1 = 11, 2 = 111, etc.
+    char tape[1024] = "11111_";
+
     struct state *q0 = create_state(0, 0);
     struct state *q1 = create_state(1, 0);
     struct state *q2 = create_state(2, 0);
     struct state *q3 = create_state(3, 0);
     struct state *q4 = create_state(4, 0);
-    struct state *q5 = create_state(5, 1);
 
     struct edge *q0e0 = create_edge(q1, '1', WRITE, BLANK_SYMBOL);
-    struct edge *q0e1 = create_edge(q1, '0', WRITE, BLANK_SYMBOL);
     add_edge_to_state(q0, q0e0);
-    add_edge_to_state(q0, q0e1);
 
     struct edge *q1e0 = create_edge(q2, BLANK_SYMBOL, MOVE_RIGHT, -1);
     add_edge_to_state(q1, q1e0);
 
-    struct edge *q2e0 = create_edge(q3, '1', MOVE_RIGHT, -1);
-    struct edge *q2e1 = create_edge(q3, '0', MOVE_RIGHT, -1);
+    struct edge *q2e0 = create_edge(q2, '1', MOVE_RIGHT, -1);
+    struct edge *q2e1 = create_edge(q3, BLANK_SYMBOL, WRITE, '1');
     add_edge_to_state(q2, q2e0);
     add_edge_to_state(q2, q2e1);
 
-    struct edge *q3e0 = create_edge(q2, '0', WRITE, '1');
-    struct edge *q3e1 = create_edge(q2, '1', WRITE, '1');
-    struct edge *q3e2 = create_edge(q4, BLANK_SYMBOL, MOVE_LEFT, -1);
+    struct edge *q3e0 = create_edge(q3, '1', MOVE_LEFT, -1);
+    struct edge *q3e1 = create_edge(q4, BLANK_SYMBOL, WRITE, '1');
     add_edge_to_state(q3, q3e0);
     add_edge_to_state(q3, q3e1);
-    add_edge_to_state(q3, q3e2);
 
-    struct edge *q4e0 = create_edge(q4, '1', MOVE_LEFT, -1);
-    struct edge *q4e1 = create_edge(q5, BLANK_SYMBOL, WRITE, '1');
-    add_edge_to_state(q4, q4e1);
-    add_edge_to_state(q4, q4e1);
+    struct edge *q4e0 = create_edge(q4, BLANK_SYMBOL, WRITE, '1');
+    add_edge_to_state(q4, q4e0);
 
-    struct machine *machine = create_machine(q0, 0, &tape[0], 1024);
+    struct machine *machine = create_machine(q0, 0, &tape[0], sizeof(tape) / sizeof(tape[0]));
+
+    // Advance the machine until it reaches an accepting state or the program is aborted.
     while (!is_computation_complete(machine))
     {
-        sleep(1);
-        print_tape(machine);
+        usleep(200000);
         printf("STATE: %d\n", machine->current_state->id);
+
+        print_tape(machine);
 
         int result = step_machine(machine);
         if (result == -1)
@@ -69,5 +67,7 @@ int main()
             break;
         }
     }
+    printf("STATE: %d\n", machine->current_state->id);
+    print_tape(machine);
     return 0;
 }

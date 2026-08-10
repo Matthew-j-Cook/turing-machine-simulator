@@ -5,7 +5,15 @@
 // Conventions:
 // Let X be the input alphabet
 // Let Y be the tape alphabet
+// Let Q be the set of states
 
+/**
+ * @brief Create a state struct
+ *
+ * @param id
+ * @param is_accepting
+ * @return struct state*
+ */
 struct state *create_state(int id, char is_accepting)
 {
     struct state *newState = (struct state *)malloc(sizeof(struct state));
@@ -15,6 +23,13 @@ struct state *create_state(int id, char is_accepting)
     return newState;
 }
 
+/**
+ * @brief Adds an edge to a state, ensures the number of edges does not exceed the max allowed.
+ *
+ * @param state
+ * @param edge
+ * @return int 0 on success, 1 if the state has too many edges
+ */
 int add_edge_to_state(struct state *state, struct edge *edge)
 {
     if (state->num_edges > MAX_EDGES_PER_STATE)
@@ -26,6 +41,11 @@ int add_edge_to_state(struct state *state, struct edge *edge)
     state->num_edges++;
     return 0;
 }
+/**
+ * @brief Deletes a state and frees its associated memory.
+ *
+ * @param state
+ */
 void delete_state(struct state *state)
 {
     // Free edges
@@ -35,6 +55,15 @@ void delete_state(struct state *state)
     }
     free(state);
 }
+/**
+ * @brief Create a edge object
+ *
+ * @param to_state The state the edge points to
+ * @param required_symbol The symbol read on the tape that triggers this edge
+ * @param action The action to perform when this edge is taken(write or move)
+ * @param write_symbol The symbol to write to the tape if the action is WRITE, ignored otherwise.
+ * @return struct edge*
+ */
 struct edge *create_edge(struct state *to_state, char required_symbol,
                          enum action_type action, char write_symbol)
 {
@@ -50,6 +79,16 @@ struct edge *create_edge(struct state *to_state, char required_symbol,
     edge->write_symbol = write_symbol;
     return edge;
 }
+
+/**
+ * @brief Create a machine object
+ *
+ * @param initial_state The initial state of the machine
+ * @param head_position The initial head position, should be 0 most of the time.
+ * @param tape The tape content
+ * @param tape_length The length of the tape
+ * @return struct machine*
+ */
 struct machine *create_machine(struct state *initial_state, int head_position,
                                char *tape, int tape_length)
 {
@@ -62,7 +101,46 @@ struct machine *create_machine(struct state *initial_state, int head_position,
 }
 
 /**
- * @brief
+ * @brief Performs a single step of the Turing machine.
+ * @details Takes the current state of the machine and determines the next action based on the head's symbol and transition rules.
+ *
+ * @param machine
+ * @return int
+ */
+int step_machine(struct machine *machine)
+{
+    struct edge *next_edge = find_matching_edge((machine->tape)[machine->head_position],
+                                                machine->current_state);
+    if (next_edge == NULL)
+    {
+        printf("FATAL ERROR\n");
+        return -1;
+    }
+    // Perform the action associated with the edge
+    switch (next_edge->action)
+    {
+    case WRITE:
+        (machine->tape)[machine->head_position] = next_edge->write_symbol;
+        break;
+    case MOVE_LEFT:
+        machine->head_position--;
+        break;
+    case MOVE_RIGHT:
+        machine->head_position++;
+        break;
+    }
+    // Advance to the next state
+    machine->current_state = next_edge->to_state;
+
+    return 0;
+}
+
+/**
+ * @brief Checks if the Turing machine has completed its computation.
+ * @details Considered complete if:
+ * 1. The head is parked at the leftmost position (head_position == 0)
+ * 2. The current state is an accepting state (is_accepting == 1)
+ * 3. The tape content is a subset of the input alphabet (Y ⊂ X)
  *
  * @param machine
  * @return int 1 if complete, 0 if not
@@ -79,55 +157,27 @@ int is_computation_complete(struct machine *machine)
     {
         return 0;
     }
-    // Check Y ⊂ X
+    // TODO: Check Y ⊂ X
     return 1;
 }
 
-int step_machine(struct machine *machine)
-{
-    struct edge *next_edge = find_next_edge_from_symbol((machine->tape)[machine->head_position],
-                                                        machine->current_state);
-    if (next_edge == NULL)
-    {
-        printf("FATAL ERROR\n");
-        return -1;
-    }
-    // printf("NEXT EDGE IS: %c\n", next_edge->required_symbol);
-
-    if (next_edge->action == WRITE)
-    {
-        (machine->tape)[machine->head_position] = next_edge->write_symbol;
-    }
-    if (next_edge->action == MOVE_LEFT)
-    {
-        machine->head_position--;
-    }
-    if (next_edge->action == MOVE_RIGHT)
-    {
-        machine->head_position++;
-    }
-    machine->current_state = next_edge->to_state;
-
-    return 0;
-}
-
 /**
- * @brief Given a symbol and a state, find which edge should be traversed next
+ * @brief Given a symbol y ⊂ Y and a state q ⊂ Q, find which edge should be traversed
  *
  * @param symbol
  * @param state
  * @return struct edge*
  */
-struct edge *find_next_edge_from_symbol(int symbol, struct state *state)
+struct edge *find_matching_edge(int symbol, struct state *state)
 {
+    // Find which edge the current state has
     for (int i = 0; i < state->num_edges; i++)
     {
-        struct edge *current_edge = (struct edge *)state->edges[i];
+        struct edge *current_edge = state->edges[i];
         if (current_edge->required_symbol == symbol)
         {
             return current_edge;
         }
     }
-    printf("STATE %d is pointing at %d EDGES", state->id, state->num_edges);
     return NULL;
 }
