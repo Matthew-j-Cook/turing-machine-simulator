@@ -5,6 +5,7 @@
 #define MOVE_RIGHT_SYMBOL 'R'
 #define MOVE_LEFT_SYMBOL 'L'
 #define MAX_EDGES_PER_STATE 10
+#include "dynamic_tape.h"
 
 struct state;
 enum action_type
@@ -35,8 +36,7 @@ struct machine
     struct state *current_state; // Pointer to the current state, starts at initial state.
     int num_states;              // The number of states in the machine
     int head_position;           // The current position of the tape head
-    char *tape;                  // Pointer to the tape (array of symbols)
-    int tape_length;             // The length of the tape
+    struct tape *tape;
 };
 
 struct state *create_state(int id, char is_accepting);
@@ -46,8 +46,7 @@ struct edge *create_edge(struct state *to_state, char required_symbol,
                          enum action_type action, char write_symbol);
 int add_edge_to_state(struct state *state, struct edge *edge);
 
-struct machine *create_machine(struct state *initial_state, int head_position,
-                               char *tape, int tape_length);
+struct machine *create_machine(struct state *initial_state, int head_position, struct tape *tape);
 
 int is_computation_complete(struct machine *machine);
 int step_machine(struct machine *machine);

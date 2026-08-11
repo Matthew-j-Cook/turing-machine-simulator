@@ -90,13 +90,12 @@ struct edge *create_edge(struct state *to_state, char required_symbol,
  * @return struct machine*
  */
 struct machine *create_machine(struct state *initial_state, int head_position,
-                               char *tape, int tape_length)
+                               struct tape *tape)
 {
     struct machine *newMachine = (struct machine *)malloc(sizeof(struct machine));
     newMachine->current_state = initial_state;
     newMachine->head_position = head_position;
     newMachine->tape = tape;
-    newMachine->tape_length = tape_length;
     return newMachine;
 }
 
@@ -109,7 +108,7 @@ struct machine *create_machine(struct state *initial_state, int head_position,
  */
 int step_machine(struct machine *machine)
 {
-    struct edge *next_edge = find_matching_edge((machine->tape)[machine->head_position],
+    struct edge *next_edge = find_matching_edge((machine->tape->cells)[machine->head_position],
                                                 machine->current_state);
 
     // If no matching edge is found, the computation is aborted.
@@ -121,12 +120,23 @@ int step_machine(struct machine *machine)
     switch (next_edge->action)
     {
     case WRITE:
-        (machine->tape)[machine->head_position] = next_edge->write_symbol;
+        // Write to tape, resize of head position is larger than tape.
+        write_to_tape(machine->tape, machine->head_position, next_edge->write_symbol);
+        if (machine->tape == NULL)
+        {
+            printf("realloc could not find enough space on heap!!\n");
+        }
         break;
     case MOVE_LEFT:
+        if (machine->head_position == 0)
+        {
+            printf("WARNING: Attempted to move left from the leftmost position.\n");
+            return -1;
+        }
         machine->head_position--;
         break;
     case MOVE_RIGHT:
+
         machine->head_position++;
         break;
     }
