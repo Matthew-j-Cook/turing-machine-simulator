@@ -25,10 +25,10 @@ struct edge
 
 struct state
 {
-    int id;                 // The unique identifier for the state
-    struct edge *edges[10]; // Pointer to an array of edges for this state
-    int num_edges;          // The number of transition edges for this state
-    char is_accepting;      // Flag indicating if this state is an accepting state
+    int id;                                  // The unique identifier for the state
+    struct edge *edges[MAX_EDGES_PER_STATE]; // Pointer to an array of edges for this state
+    int num_edges;                           // The number of transition edges for this state
+    char is_accepting;                       // Flag indicating if this state is an accepting state
 };
 
 struct machine

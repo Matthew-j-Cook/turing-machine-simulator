@@ -17,6 +17,11 @@
 struct state *create_state(int id, char is_accepting)
 {
     struct state *newState = (struct state *)malloc(sizeof(struct state));
+    if (newState == NULL)
+    {
+        printf("ERROR: Failed to allocate memory to state\n");
+        return newState;
+    }
     newState->id = id;
     newState->num_edges = 0;
     newState->is_accepting = is_accepting == 1 ? 1 : 0; // Set to 1 or 0
@@ -32,7 +37,24 @@ struct state *create_state(int id, char is_accepting)
  */
 int add_edge_to_state(struct state *state, struct edge *edge)
 {
-    if (state->num_edges > MAX_EDGES_PER_STATE)
+    if (edge == NULL)
+    {
+        return 1;
+    }
+
+    // Reject duplicate transitions for the same input symbol
+    for (int i = 0; i < state->num_edges; i++)
+    {
+        if (state->edges[i]->required_symbol == edge->required_symbol)
+        {
+            printf("ERROR: duplicate transition in state %d for symbol '%c'\n",
+                   state->id, edge->required_symbol);
+            free(edge);
+            return 1;
+        }
+    }
+
+    if (state->num_edges >= MAX_EDGES_PER_STATE)
     {
         printf("WARNING: Too many edges for state of id: %d", state->id);
         return 1;
@@ -67,12 +89,20 @@ void delete_state(struct state *state)
 struct edge *create_edge(struct state *to_state, char required_symbol,
                          enum action_type action, char write_symbol)
 {
-    if (write_symbol == MOVE_LEFT_SYMBOL | write_symbol == MOVE_RIGHT_SYMBOL)
+    if (action == WRITE)
     {
-        printf("WARNING: INVALID EDGE SYMBOL: %c", required_symbol);
-        return NULL;
+        if (write_symbol == MOVE_LEFT_SYMBOL || write_symbol == MOVE_RIGHT_SYMBOL)
+        {
+            printf("ERROR: Cannot use move left and right symbols for the write symbol");
+            return NULL;
+        }
     }
     struct edge *edge = (struct edge *)malloc(sizeof(struct edge));
+    if (edge == NULL)
+    {
+        printf("ERROR: Failed to allocate memory to edge\n");
+        return edge;
+    }
     edge->to_state = to_state;
     edge->required_symbol = required_symbol;
     edge->action = action;
@@ -93,6 +123,11 @@ struct machine *create_machine(struct state *initial_state, int head_position,
                                struct tape *tape)
 {
     struct machine *newMachine = (struct machine *)malloc(sizeof(struct machine));
+    if (newMachine == NULL)
+    {
+        printf("ERROR: Failed to allocate memory to machine\n");
+        return newMachine;
+    }
     newMachine->current_state = initial_state;
     newMachine->head_position = head_position;
     newMachine->tape = tape;
@@ -121,6 +156,7 @@ int step_machine(struct machine *machine)
     {
     case WRITE:
         // Write to tape, resize of head position is larger than tape.
+
         write_to_tape(machine->tape, machine->head_position, next_edge->write_symbol);
         if (machine->tape == NULL)
         {

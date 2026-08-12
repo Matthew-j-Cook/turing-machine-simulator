@@ -1,4 +1,4 @@
-objects = machine.o simulation.o dynamic_tape.o
+objects = machine.o simulation.o dynamic_tape.o csv_parser.o
 
 simulation:$(objects)
 	gcc -o simulation $(objects)
@@ -12,6 +12,8 @@ machine.o: machine.c machine.h
 tape.o: dynamic_tape.c dynamic_tape.h
 	gcc -c dynamic_tape.c
 
-
+csv_parser.o: csv_parser.c csv_parser.h
+	gcc -c csv_parser.c
+	
 clean:
 	rm -f *.o simulation
