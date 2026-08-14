@@ -8,6 +8,11 @@
 
 static void resize_tape(struct tape *tape);
 
+/**
+ * @brief Create a tape struct
+ *
+ * @return struct tape*
+ */
 struct tape *create_tape()
 {
     struct tape *tape = (struct tape *)malloc(sizeof(struct tape));
@@ -62,6 +67,7 @@ void write_to_tape(struct tape *tape, int head_position, char c)
     }
     tape->cells[head_position] = c;
 }
+
 /**
  * @brief Safely write null terminated string to start of tape. Resizes tape if needed.
  *
@@ -77,4 +83,28 @@ void populate_tape_with_string(struct tape *tape, char *string)
         write_to_tape(tape, i, c);
         i++;
     }
+}
+
+/**
+ * @brief Prints the tape, with a marker under the head position.
+ *
+ * @param tape
+ * @param head_position
+ */
+void print_tape(struct tape *tape, int head_position)
+{
+    const char *prefix = "TAPE: ";
+    printf("%s", prefix);
+    for (int i = 0; i < tape->tape_size; i++)
+    {
+        putchar(tape->cells[i]);
+    }
+    putchar('\n');
+
+    // marker line, aligned under the head position
+    for (int i = 0; i < (int)strlen(prefix) + head_position; i++)
+    {
+        putchar(' ');
+    }
+    printf("^\n");
 }

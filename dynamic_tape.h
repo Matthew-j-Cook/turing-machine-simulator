@@ -11,4 +11,6 @@ struct tape
 struct tape *create_tape();
 void write_to_tape(struct tape *tape, int head_position, char c);
 void populate_tape_with_string(struct tape *tape, char *string);
+void print_tape(struct tape *tape, int head_position);
+
 #endif // TAPE_H

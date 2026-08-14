@@ -1,114 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "machine.h"
-
+#include "state.h"
 // Conventions:
 // Let X be the input alphabet
 // Let Y be the tape alphabet
 // Let Q be the set of states
-
-/**
- * @brief Create a state struct
- *
- * @param id
- * @param is_accepting
- * @return struct state*
- */
-struct state *create_state(int id, char is_accepting)
-{
-    struct state *newState = (struct state *)malloc(sizeof(struct state));
-    if (newState == NULL)
-    {
-        printf("ERROR: Failed to allocate memory to state\n");
-        return newState;
-    }
-    newState->id = id;
-    newState->num_edges = 0;
-    newState->is_accepting = is_accepting == 1 ? 1 : 0; // Set to 1 or 0
-    return newState;
-}
-
-/**
- * @brief Adds an edge to a state, ensures the number of edges does not exceed the max allowed.
- *
- * @param state
- * @param edge
- * @return int 0 on success, 1 if the state has too many edges
- */
-int add_edge_to_state(struct state *state, struct edge *edge)
-{
-    if (edge == NULL)
-    {
-        return 1;
-    }
-
-    // Reject duplicate transitions for the same input symbol
-    for (int i = 0; i < state->num_edges; i++)
-    {
-        if (state->edges[i]->required_symbol == edge->required_symbol)
-        {
-            printf("ERROR: duplicate transition in state %d for symbol '%c'\n",
-                   state->id, edge->required_symbol);
-            free(edge);
-            return 1;
-        }
-    }
-
-    if (state->num_edges >= MAX_EDGES_PER_STATE)
-    {
-        printf("WARNING: Too many edges for state of id: %d", state->id);
-        return 1;
-    }
-    state->edges[state->num_edges] = edge;
-    state->num_edges++;
-    return 0;
-}
-/**
- * @brief Deletes a state and frees its associated memory.
- *
- * @param state
- */
-void delete_state(struct state *state)
-{
-    // Free edges
-    for (int i = 0; i < state->num_edges; i++)
-    {
-        free(state->edges[i]);
-    }
-    free(state);
-}
-/**
- * @brief Create a edge object
- *
- * @param to_state The state the edge points to
- * @param required_symbol The symbol read on the tape that triggers this edge
- * @param action The action to perform when this edge is taken(write or move)
- * @param write_symbol The symbol to write to the tape if the action is WRITE, ignored otherwise.
- * @return struct edge*
- */
-struct edge *create_edge(struct state *to_state, char required_symbol,
-                         enum action_type action, char write_symbol)
-{
-    if (action == WRITE)
-    {
-        if (write_symbol == MOVE_LEFT_SYMBOL || write_symbol == MOVE_RIGHT_SYMBOL)
-        {
-            printf("ERROR: Cannot use move left and right symbols for the write symbol");
-            return NULL;
-        }
-    }
-    struct edge *edge = (struct edge *)malloc(sizeof(struct edge));
-    if (edge == NULL)
-    {
-        printf("ERROR: Failed to allocate memory to edge\n");
-        return edge;
-    }
-    edge->to_state = to_state;
-    edge->required_symbol = required_symbol;
-    edge->action = action;
-    edge->write_symbol = write_symbol;
-    return edge;
-}
 
 /**
  * @brief Create a machine object
@@ -136,31 +33,32 @@ struct machine *create_machine(struct state *initial_state, int head_position,
 
 /**
  * @brief Performs a single step of the Turing machine.
- * @details Takes the current state of the machine and determines the next action based on the head's symbol and transition rules.
+ * @details Takes the current state of the machine and determines the next
+ * action based on the head's symbol and transition rules.
  *
  * @param machine
  * @return int
  */
 int step_machine(struct machine *machine)
 {
-    struct edge *next_edge = find_matching_edge((machine->tape->cells)[machine->head_position],
-                                                machine->current_state);
+    struct edge *next_edge = find_next_edge((machine->tape->cells)[machine->head_position],
+                                            machine->current_state);
 
-    // If no matching edge is found, the computation is aborted.
+    // Undefined transition for state symbol pair. the computation is aborted.
     if (next_edge == NULL)
     {
+        printf("Undefined transition: No transition was found for state id: %d and symbol: \"%c\" ", machine->current_state->id, machine->tape->cells[machine->head_position]);
         return -1;
     }
     // Perform the action associated with the edge
     switch (next_edge->action)
     {
     case WRITE:
-        // Write to tape, resize of head position is larger than tape.
-
+        // Write to tape. Will resize if head position is close to tape size.
         write_to_tape(machine->tape, machine->head_position, next_edge->write_symbol);
         if (machine->tape == NULL)
         {
-            printf("realloc could not find enough space on heap!!\n");
+            printf("Realloc could not find enough space on heap!!\n");
         }
         break;
     case MOVE_LEFT:
@@ -208,23 +106,8 @@ int is_computation_complete(struct machine *machine)
     return 1;
 }
 
-/**
- * @brief Given a symbol y ⊂ Y and a state q ⊂ Q, find which edge should be traversed
- *
- * @param symbol
- * @param state
- * @return struct edge*
- */
-struct edge *find_matching_edge(int symbol, struct state *state)
+void print_machine_state(struct machine *machine)
 {
-    // Find which edge the current state has
-    for (int i = 0; i < state->num_edges; i++)
-    {
-        struct edge *current_edge = state->edges[i];
-        if (current_edge->required_symbol == symbol)
-        {
-            return current_edge;
-        }
-    }
-    return NULL;
+    printf("STATE: %d\n", machine->current_state->id);
+    print_tape(machine->tape, machine->head_position);
 }
