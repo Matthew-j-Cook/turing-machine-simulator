@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_STATES 64
+#define MAX_STATES 512
 #define DEBUG 0
 
 /**
