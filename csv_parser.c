@@ -5,8 +5,6 @@
 #include <string.h>
 
 #define MAX_STATES 64
-#define MAX_LINE_SIZE 1024
-#define MAX_NAME_LEN 32
 #define DEBUG 0
 
 /**
@@ -49,7 +47,7 @@ static struct state *create_or_get_state_from_array(struct state **states, char 
     int i = 0;
     while (states[i] != NULL)
     {
-        if (strncmp((states[i])->name, name, sizeof(char) * MAX_NAME_LEN) == 0)
+        if (strncmp((states[i])->name, name, sizeof(char) * MAX_NAME_LENGTH) == 0)
         {
             return states[i];
         }
@@ -75,22 +73,21 @@ static struct state *create_or_get_state_from_array(struct state **states, char 
  */
 struct machine *load_machine_from_file(FILE *file)
 {
-
     if (file == NULL)
     {
-        return NULL;
+        perror("Failed to open file");
     }
     int error_code = 0; // This should remain 0 by the time we create the machine or we know something was wrong with the CSV format
 
     struct state *states[MAX_STATES + 1] = {NULL}; // Null terminated array of pointer to states
-    char line_buffer[MAX_LINE_SIZE];               // When we call read_field, store it here
+    char line_buffer[MAX_NAME_LENGTH];             // Read the next field from  read_field into here
     struct state *start_state = NULL;              // Used to create machine later
     int seperator;
     // Loop through file
     while (1)
     {
         // Read the 4 fields from this line
-        seperator = read_field(file, line_buffer, sizeof(char) * MAX_LINE_SIZE);
+        seperator = read_field(file, line_buffer, sizeof(char) * MAX_NAME_LENGTH);
         if (seperator == EOF)
             break;
 
@@ -100,7 +97,7 @@ struct machine *load_machine_from_file(FILE *file)
             // Continue until next line
             while (seperator != '\n')
             {
-                seperator = read_field(file, line_buffer, sizeof(char) * MAX_LINE_SIZE);
+                seperator = read_field(file, line_buffer, sizeof(char) * MAX_NAME_LENGTH);
             }
             continue;
         }
@@ -108,15 +105,15 @@ struct machine *load_machine_from_file(FILE *file)
         strncpy(from_state_name, line_buffer, sizeof(from_state_name));
 
         char read_symbol;
-        seperator = read_field(file, line_buffer, sizeof(char) * MAX_LINE_SIZE);
+        seperator = read_field(file, line_buffer, sizeof(char) * MAX_NAME_LENGTH);
         read_symbol = line_buffer[0];
 
         char to_state_name[32];
-        seperator = read_field(file, line_buffer, sizeof(char) * MAX_LINE_SIZE);
+        seperator = read_field(file, line_buffer, sizeof(char) * MAX_NAME_LENGTH);
         strncpy(to_state_name, line_buffer, sizeof(to_state_name));
 
         char tape_action; // either a symbol to write or a direction to move (R/L)
-        seperator = read_field(file, line_buffer, sizeof(char) * MAX_LINE_SIZE);
+        seperator = read_field(file, line_buffer, sizeof(char) * MAX_NAME_LENGTH);
         tape_action = line_buffer[0];
 
         // Any of the fields were empty, or white space

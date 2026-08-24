@@ -14,7 +14,7 @@ struct state *create_state(char *name, char is_accepting)
     struct state *newState = (struct state *)malloc(sizeof(struct state));
     if (newState == NULL)
     {
-        printf("ERROR: Failed to allocate memory to state\n");
+        perror("Failed to allocate memory to state");
         return newState;
     }
     strncpy(newState->name, name, 32 - 1);
@@ -97,7 +97,7 @@ struct edge *create_edge(struct state *to_state, char required_symbol,
     struct edge *edge = (struct edge *)malloc(sizeof(struct edge));
     if (edge == NULL)
     {
-        printf("ERROR: Failed to allocate memory to edge\n");
+        perror("Failed to allocate memory to edge");
         return edge;
     }
     edge->to_state = to_state;

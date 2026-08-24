@@ -22,7 +22,7 @@ struct machine *create_machine(struct state *initial_state, int head_position,
     struct machine *newMachine = (struct machine *)malloc(sizeof(struct machine));
     if (newMachine == NULL)
     {
-        printf("ERROR: Failed to allocate memory to machine\n");
+        perror("Failed to allocate memory to machine");
         return newMachine;
     }
     newMachine->current_state = initial_state;

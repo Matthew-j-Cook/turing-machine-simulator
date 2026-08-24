@@ -14,6 +14,7 @@ int main()
     {
         return 1;
     }
+    printf("Loaded machine from file\n");
 
     // Advance the machine until it reaches an accepting state or the program is aborted.
     int step = 0;

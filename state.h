@@ -2,6 +2,7 @@
 #define STATE_H
 
 #define MAX_EDGES_PER_STATE 10
+#define MAX_NAME_LENGTH 32
 #define BLANK_SYMBOL '_'
 #define MOVE_RIGHT_SYMBOL 'R'
 #define MOVE_LEFT_SYMBOL 'L'
@@ -23,7 +24,7 @@ struct edge
 
 struct state
 {
-    char name[32];                           // The unique identifier for the state
+    char name[MAX_NAME_LENGTH];              // The unique identifier for the state
     struct edge *edges[MAX_EDGES_PER_STATE]; // Pointer to an array of edges for this state
     int num_edges;                           // The number of transition edges for this state
     char is_accepting;                       // Flag indicating if this state is an accepting state

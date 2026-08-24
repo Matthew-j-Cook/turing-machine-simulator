@@ -18,11 +18,15 @@ struct tape *create_tape()
     struct tape *tape = (struct tape *)malloc(sizeof(struct tape));
     if (tape == NULL)
     {
-        printf("ERROR: Failed to allocate memory to tape\n");
+        perror("Failed to allocate memory to tape");
         return tape;
     }
     tape->tape_size = INITIAL_TAPE_SIZE;
     tape->cells = (char *)malloc(sizeof(char) * tape->tape_size);
+    if (tape->cells == NULL)
+    {
+        perror("Failed to allocate memory to tape cells");
+    }
     // Initialise the tape to the blank symbol
     memset(tape->cells, BLANK_SYMBOL, sizeof(char) * tape->tape_size);
     return tape;
