@@ -1,14 +1,15 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "state.h"
 /**
  * @brief Create a state object
  *
- * @param id
+ * @param name The name of the state, should be unique
  * @param is_accepting
  * @return struct state*
  */
-struct state *create_state(int id, char is_accepting)
+struct state *create_state(char *name, char is_accepting)
 {
     struct state *newState = (struct state *)malloc(sizeof(struct state));
     if (newState == NULL)
@@ -16,7 +17,7 @@ struct state *create_state(int id, char is_accepting)
         printf("ERROR: Failed to allocate memory to state\n");
         return newState;
     }
-    newState->id = id;
+    strncpy(newState->name, name, 32 - 1);
     newState->num_edges = 0;
     newState->is_accepting = is_accepting == 1 ? 1 : 0; // Set to 1 or 0
     return newState;
@@ -55,8 +56,8 @@ int add_edge_to_state(struct state *state, struct edge *edge)
     {
         if (state->edges[i]->required_symbol == edge->required_symbol)
         {
-            printf("ERROR: duplicate transition in state %d for symbol '%c'\n",
-                   state->id, edge->required_symbol);
+            printf("ERROR: duplicate transition in state %s for symbol '%c'\n",
+                   state->name, edge->required_symbol);
             free(edge);
             return 1;
         }
@@ -64,7 +65,7 @@ int add_edge_to_state(struct state *state, struct edge *edge)
 
     if (state->num_edges >= MAX_EDGES_PER_STATE)
     {
-        printf("WARNING: Too many edges for state of id: %d", state->id);
+        printf("WARNING: Too many edges for state: %s", state->name);
         return 1;
     }
     state->edges[state->num_edges] = edge;

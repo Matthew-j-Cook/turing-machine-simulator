@@ -23,13 +23,13 @@ struct edge
 
 struct state
 {
-    int id;                                  // The unique identifier for the state
+    char name[32];                           // The unique identifier for the state
     struct edge *edges[MAX_EDGES_PER_STATE]; // Pointer to an array of edges for this state
     int num_edges;                           // The number of transition edges for this state
     char is_accepting;                       // Flag indicating if this state is an accepting state
 };
 
-struct state *create_state(int id, char is_accepting);
+struct state *create_state(char *name, char is_accepting);
 void delete_state(struct state *state);
 
 struct edge *create_edge(struct state *to_state, char required_symbol,

@@ -47,7 +47,7 @@ int step_machine(struct machine *machine)
     // Undefined transition for state symbol pair. the computation is aborted.
     if (next_edge == NULL)
     {
-        printf("Undefined transition: No transition was found for state id: %d and symbol: \"%c\" ", machine->current_state->id, machine->tape->cells[machine->head_position]);
+        printf("Undefined transition: No transition was found for state id: %s and symbol: \"%c\" ", machine->current_state->name, machine->tape->cells[machine->head_position]);
         return -1;
     }
     // Perform the action associated with the edge
@@ -108,6 +108,6 @@ int is_computation_complete(struct machine *machine)
 
 void print_machine_state(struct machine *machine)
 {
-    printf("STATE: %d\n", machine->current_state->id);
+    printf("STATE: %s\n", machine->current_state->name);
     print_tape(machine->tape, machine->head_position);
 }
