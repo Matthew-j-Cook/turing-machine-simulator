@@ -4,23 +4,31 @@
 
 #include "machine.h"
 #include "csv_parser.h"
+#define STEP_DELAY 80000
 
-int main()
+int main(int argc, char **argv)
 {
-    // This simple turing machine will shift a string right by one and pad with 0.
 
-    struct machine *machine = load_machine_from_file(fopen("machine.csv", "r"));
+    if (argc < 3)
+    {
+        printf("Usage: ./simulation <machine-csv-path> <tape-string>\n");
+        return 1;
+    }
+
+    struct tape *tape = create_tape();
+    populate_tape_with_string(tape, argv[2]);
+
+    struct machine *machine = load_machine_from_file(fopen(argv[1], "r"), tape);
     if (machine == NULL)
     {
         return 1;
     }
-    printf("Loaded machine from file\n");
 
     // Advance the machine until it reaches an accepting state or the program is aborted.
     int step = 0;
     while (!is_computation_complete(machine))
     {
-        usleep(80000);
+        usleep(STEP_DELAY);
         printf("STEP: %d\n", step);
         print_machine_state(machine);
         step++;

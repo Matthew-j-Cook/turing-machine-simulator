@@ -8,8 +8,7 @@
 // Let Q be the set of states
 
 /**
- * @brief Create a machine object
- *
+ * @brief Create a machine struct
  * @param initial_state The initial state of the machine
  * @param head_position The initial head position, should be 0 most of the time.
  * @param tape The tape content

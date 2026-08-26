@@ -65,13 +65,13 @@ static struct state *create_or_get_state_from_array(struct state **states, char 
 }
 
 /**
- * @brief Given a CSV file, create states and edges and return a turing machine or NULL if something goes wrong.
+ * @brief Will load states and edges from a csv file and return a machine struct. Requires a tape for the machine to use.
  * Will close the file when done.
  *
  * @param file
- * @return struct machine*
+ * @return struct machine* OR NULL if something goes wrong.
  */
-struct machine *load_machine_from_file(FILE *file)
+struct machine *load_machine_from_file(FILE *file, struct tape *tape)
 {
     if (file == NULL)
     {
@@ -179,10 +179,7 @@ struct machine *load_machine_from_file(FILE *file)
         printf("ERROR: Failed to load machine from file. Code: %d\n", error_code);
         return NULL;
     }
-    // TODO: Add a way to enter custom tapes easier. for now this works.
-    struct tape *tape = create_tape();
-    char tape_string[10] = "10001";
-    populate_tape_with_string(tape, tape_string);
+
     struct machine *machine = create_machine(start_state, 0, tape);
     return machine;
 }

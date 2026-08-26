@@ -12,12 +12,12 @@ start,1,q2,x
 q1,x,q1,R
 q1,1,q4,0
 q1,0,q0,0
-q1,_,q5,0
+q1,_,park_head,0
 
 q2,x,q2,R
 q2,0,q3,1
 q2,1,q0,1
-q2,_,q5,1
+q2,_,park_head,1
 
 q0,1,q2,R
 q0,0,q1,R
@@ -25,7 +25,7 @@ q0,0,q1,R
 q4,0,q2,R
 q3,1,q1,R
 
-q5,0,q5,L
-q5,1,q5,L
-q5,x,end,0
+park_head,0,park_head,L
+park_head,1,park_head,L
+park_head,x,end,0
 end,0,end,0

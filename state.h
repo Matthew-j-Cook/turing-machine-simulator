@@ -1,7 +1,7 @@
 #ifndef STATE_H
 #define STATE_H
 
-#define MAX_EDGES_PER_STATE 10
+#define MAX_EDGES_PER_STATE 16
 #define MAX_NAME_LENGTH 32
 #define BLANK_SYMBOL '_'
 #define MOVE_RIGHT_SYMBOL 'R'
@@ -30,12 +30,16 @@ struct state
     char is_accepting;                       // Flag indicating if this state is an accepting state
 };
 
+// Create a state struct
 struct state *create_state(char *name, char is_accepting);
+// Frees a state and its edges
 void delete_state(struct state *state);
-
+// Create an edge struct. A state will hold an array of these edges which each point to a state that can be traversed with a required_symbol
 struct edge *create_edge(struct state *to_state, char required_symbol,
                          enum action_type action, char write_symbol);
+// Adds an edge to a state, ensures the number of edges does not exceed the max allowed.
 int add_edge_to_state(struct state *state, struct edge *edge);
+// Given a state and a symbol, find which edge beloinging to the state should be traversed.
 struct edge *find_next_edge(int symbol, struct state *state);
 
 #endif // STATE_H

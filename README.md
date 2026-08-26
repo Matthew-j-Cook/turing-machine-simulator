@@ -15,6 +15,11 @@ simulation.h / simulation.c                     example program which runs the s
 csv_parser.c / csv_parser.h                     can load a csv formatted machine from a file
   ```
 
+## Notation
+As with all turing machine, notation differs.
+- When moving from state A to B, the machine can either write a symbol to the tape XOR move the tape head. It cannot do both at the same time.
+- The tape is infinite to the right however has a starting point. It is not infinite in both directions like some notation.
+- For a computation to be considered complete, the machine must be in an accepting state AND the head must be parked at the left most position of the tape.(You could easily edit this if you wish in the code)
 ## How to use
 
 Clone the project
@@ -43,19 +48,25 @@ Creating your own turing machine
 ```csv
 ## Double hashtag indicates comments
 ## Transition Structure:
-## [current_state],[read_symbol],[to_state],[R] || [L] || [write_symbol]
+## [current_state],[read_symbol],[to_state],[R] OR [L] OR [write_symbol]
 ## R means move the tape right, L for left, any other symbol means write that symbol.
 ## "_" represents the blank symbol
 ## Note: first line represents start state and last represents accepting state.
-```
-- e.g. q1,0,q2,1 would mean when in state q1 and reading a 0, move to q2 and write a 1.
-- e.g. q1,1,q2,R would mean when in state q1 and reading a 1, move to q1 and move the tape right.
 
-**Note on notation:** when moving from state A to B, the machine can either write a symbol to the tape XOR move the tape head. It cannot do both at the same time like many others. I'm aware this isnt the most common notation but this is how my lecturer taughgt me.
+start,0,q2,1
+q2,1,q2,R
+```
+- e.g. start,0,q2,1 would mean when in state start and reading a 0, move to state q2 and write a 1.
+- e.g. q2,1,q2,R would mean when in state q2 and reading a 1, move to state q2 and move the tape right.
+
+
 ### Using the CSV parser
 Creating and running a machine using the csv parser.
 ```c
-struct machine *machine = load_machine_from_file(fopen("machine.csv", "r"));
+struct tape *tape = create_tape();
+populate_tape_with_string(tape, "0110");
+
+struct machine *machine = load_machine_from_file(fopen(argv[1], "r"), tape);
 if (machine == NULL)
     return 1;
 
