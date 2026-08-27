@@ -3,7 +3,7 @@
 #include <string.h>
 #include "state.h"
 /**
- * @brief Create a state object
+ * @brief Create a state struct
  *
  * @param name The name of the state, should be unique
  * @param is_accepting
@@ -24,7 +24,7 @@ struct state *create_state(char *name, char is_accepting)
 }
 
 /**
- * @brief Deletes a state and its edges.
+ * @brief Frees a state and its edges.
  *
  * @param state
  */

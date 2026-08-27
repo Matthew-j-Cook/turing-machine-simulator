@@ -7,6 +7,8 @@
 ## You cannot name states or write symbols "," or " ".
 ## "_" is considered the blank symbol
 
+accepting-state:end
+
 start,0,q1,x
 start,1,q2,x
 q1,x,q1,R
@@ -28,4 +30,3 @@ q3,1,q1,R
 park_head,0,park_head,L
 park_head,1,park_head,L
 park_head,x,end,0
-end,0,end,0

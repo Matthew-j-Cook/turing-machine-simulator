@@ -83,6 +83,9 @@ struct machine *load_machine_from_file(FILE *file, struct tape *tape)
     char line_buffer[MAX_NAME_LENGTH];             // Read the next field from  read_field into here
     struct state *start_state = NULL;              // Used to create machine later
     int seperator;
+    char accepting_state_name[MAX_NAME_LENGTH]; // Stores the accepting states name when found in the csv
+    accepting_state_name[0] = '\0';
+
     // Loop through file
     while (1)
     {
@@ -91,8 +94,16 @@ struct machine *load_machine_from_file(FILE *file, struct tape *tape)
         if (seperator == EOF)
             break;
 
+        // We found the accepting state line!
+        if (strncmp(line_buffer, "accepting-state:", strlen("accepting-state:")) == 0)
+        {
+            // Copy text after "accepting-state:"
+            strncpy(accepting_state_name, &line_buffer[strlen("accepting-state:")], MAX_NAME_LENGTH - 1);
+            printf("%s\n", accepting_state_name);
+            continue;
+        }
         // We reached a blank or comment line
-        if (line_buffer[0] == '#' && line_buffer[1] == '#' || seperator == '\n')
+        if ((line_buffer[0] == '#' && line_buffer[1] == '#') || seperator == '\n')
         {
             // Continue until next line
             while (seperator != '\n')
@@ -159,20 +170,30 @@ struct machine *load_machine_from_file(FILE *file, struct tape *tape)
         // printf("Loaded transition: %s --%c/%c--> %s\n", from_state->name, read_symbol, tape_action, to_state->name);
     }
     fclose(file);
-    // Find the last state and make it accepting
-    if (start_state != NULL)
+
+    // Find accepting state by name and actually make it accepting
+    int i = 0;
+    while (1)
     {
-        int i = 0;
-        while (states[i] != NULL)
+        struct state *current_state;
+        current_state = states[i];
+        if (current_state == NULL || i > MAX_STATES || accepting_state_name[0] == '\0')
         {
-            i++;
+            // no accepting state found
+            error_code = 4;
+            break;
         }
-        states[i - 1]->is_accepting = 1;
+        if (strncmp(current_state->name, accepting_state_name, MAX_NAME_LENGTH) == 0)
+        {
+            current_state->is_accepting = 1;
+            break;
+        }
+        i++;
     }
-    else
+    // If theres no start state, then theres no states at all. We need atleast 1 state for a turing machine
+    if (start_state == NULL)
     {
-        // If theres no start state, then theres no states at all. We need atleast 1 state for a turing machine
-        error_code = 4;
+        error_code = 5;
     }
     if (error_code != 0)
     {

@@ -39,9 +39,9 @@ Compile with make
 
 Run the program
 ```bash
-  ./simulation
+  ./simulation example_machine.csv 110011
 ```
-This will load and run an example machine written inside machine.csv. The output will display the internal state of the turing machine as it runs through it's computation.
+This will load and run an example machine written inside example_machine.csv with tape 110011. The output will display the internal state of the turing machine as it runs through it's computation.
 ## Usage/Examples
 ### CSV format
 Creating your own turing machine
@@ -51,8 +51,11 @@ Creating your own turing machine
 ## [current_state],[read_symbol],[to_state],[R] OR [L] OR [write_symbol]
 ## R means move the tape right, L for left, any other symbol means write that symbol.
 ## "_" represents the blank symbol
-## Note: first line represents start state and last represents accepting state.
 
+## We must have one accepting state somewhere in the file
+accepting-state:q2
+
+## Note: first line represents start state
 start,0,q2,1
 q2,1,q2,R
 ```
@@ -86,8 +89,6 @@ while (!is_computation_complete(machine))
 print_machine_state(machine);
 printf("head pos: %d, tape size: %d", machine->head_position, machine->tape->tape_size);
 
-return 0;
-
 ```
 
 ### Manual creation
@@ -107,4 +108,3 @@ populatore_tape_with_string(tape, tape_string);
 struct machine *machine = create_machine(state, 0, tape);
 //Now just step the machine until computation is complete
 ```
-## CSV format
