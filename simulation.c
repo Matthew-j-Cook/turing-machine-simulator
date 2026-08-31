@@ -4,7 +4,7 @@
 
 #include "machine.h"
 #include "csv_parser.h"
-#define STEP_DELAY 80000
+#define STEP_DELAY 8000
 
 int main(int argc, char **argv)
 {
@@ -19,19 +19,20 @@ int main(int argc, char **argv)
     populate_tape_with_string(tape, argv[2]);
 
     struct machine *machine = load_machine_from_file(fopen(argv[1], "r"), tape);
+    // Failed to make machine. Probably incorrectly formatted CSV.
     if (machine == NULL)
     {
         return 1;
     }
 
-    // Advance the machine until it reaches an accepting state or the program is aborted.
     int step = 0;
+    // Advance the machine until it reaches an accepting state or the program is aborted.
     while (!is_computation_complete(machine))
     {
-        usleep(STEP_DELAY);
         printf("STEP: %d\n", step);
-        print_machine_state(machine);
         step++;
+
+        print_machine_state(machine);
 
         int result = step_machine(machine);
 
@@ -40,6 +41,7 @@ int main(int argc, char **argv)
             printf("Computation aborted.\n");
             break;
         }
+        usleep(STEP_DELAY);
     }
 
     if (is_computation_complete(machine))

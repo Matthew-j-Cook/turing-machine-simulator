@@ -1,13 +1,12 @@
 ## Transition Structure:
-## [current_state],[read_symbol],[to_state],[R] || [L] || [write_symbol]
-## Note: first line represents start state and last represents accepting state.
-## This machine shifts a string right by 1, padding with 0
+## [current_state],[read_symbol],[to_state],[R] OR [L] OR [write_symbol]
+## R means move the tape right, L for left, any other symbol means write that symbol.
+## "_" represents the blank symbol
 
-## You cannot write symbols "R" or "L" to the tape.
-## You cannot name states or write symbols "," or " ".
-## "_" is considered the blank symbol
-
+## We must have one accepting state somewhere in the file
 accepting-state:end
+
+## This machine shifts a string right by 1, padding with 0
 
 start,0,q1,x
 start,1,q2,x
