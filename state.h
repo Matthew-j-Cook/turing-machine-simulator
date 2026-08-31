@@ -19,7 +19,7 @@ struct edge
     struct state *to_state;  // The state to which the transition leads
     char required_symbol;    // The symbol that triggers the transition
     enum action_type action; // The action to perform (write or move)
-    char write_symbol;       // Determines what the head will do, write or move.
+    char write_symbol;       // Determines what will be written to the tape, ignored if action type is move
 };
 
 struct state

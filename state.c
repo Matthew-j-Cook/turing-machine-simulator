@@ -109,6 +109,9 @@ struct edge *create_edge(struct state *to_state, char required_symbol,
 
 /**
  * @brief Given a symbol y ⊂ Y and a state q ⊂ Q, find which edge should be traversed
+ * This is basically the transition function for this machine.
+ * It takes a state and a tape symbol as input and returns the next edge to traverse.
+ * The edge contains the next state and the symbol to write, or the tape movement(left or right), but not both.
  *
  * @param symbol
  * @param state

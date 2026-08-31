@@ -69,7 +69,7 @@ Creating and running a machine using the csv parser.
 struct tape *tape = create_tape();
 populate_tape_with_string(tape, "0110");
 
-struct machine *machine = load_machine_from_file(fopen(argv[1], "r"), tape);
+struct machine *machine = load_machine_from_file(fopen("example_machine.csv", "r"), tape);
 if (machine == NULL)
     return 1;
 
@@ -106,5 +106,5 @@ char tape_string[] = "101";
 populatore_tape_with_string(tape, tape_string);
 
 struct machine *machine = create_machine(state, 0, tape);
-//Now just step the machine until computation is complete
+//Now just step the machine until computation is complete like above
 ```

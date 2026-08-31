@@ -11,7 +11,7 @@ int main(int argc, char **argv)
 
     if (argc < 3)
     {
-        printf("Usage: ./simulation <machine-csv-path> <tape-string>\n");
+        printf("Usage: %s <machine-csv-path> <tape-string>\n", argv[0]);
         return 1;
     }
 
